@@ -68,6 +68,10 @@ body {
         grid-template-columns: repeat(4, 150px);
     }
 
+    &.size-5x5{
+        grid-template-columns: repeat(5, 150px);
+    }
+
 
 
 }
@@ -96,7 +100,7 @@ body {
     margin-bottom: 10px;
 }
 
-#select-belt{
+#select-belt, #select-grid{
     appearance: none;
     margin: 10px;
     background-color: var(--dark-gray);
