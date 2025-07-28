@@ -1,7 +1,7 @@
 [package]
 name = "itf_patterns"
 version = "0.1.0"
-authors = ["Oscar Aspelin <oscar.aspelin@1928diagnostics.com>"]
+authors = ["Oscar Aspelin <oscar.aspelin@gmail.com>"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
