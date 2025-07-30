@@ -3,7 +3,7 @@
 [web.app]
 
 # HTML title tag content
-title = "itf_patterns"
+title = "itf_patterns_rs"
 
 # include `assets` in web platform
 [web.resource]
