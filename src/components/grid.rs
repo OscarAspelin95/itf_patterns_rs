@@ -4,9 +4,6 @@ use rand::seq::{IndexedRandom, SliceRandom};
 const RANDOMIZE_SVG: Asset = asset!("/assets/randomize.svg");
 const TTKD_LOGO: Asset = asset!("/assets/ttkd_logo.jpeg");
 
-// TODO - add reset/reload button. Keep belt choice but randomize patterns and reset button toggles
-// TODO - add option for 3x3 grid, 4x4 grid or all patterns.
-
 static PATTERNS: &'static [&str; 24] = &[
     // 1-Kup
     "Chon-Ji",
@@ -42,10 +39,10 @@ static PATTERNS: &'static [&str; 24] = &[
 ];
 
 #[component]
-pub fn Bingo() -> Element {
+pub fn Grid() -> Element {
     rsx! {
         div { id: "container",
-            span { id: "container-header", "Mönster-bingo" }
+            span { id: "container-header", "Pattern randomizer" }
             div { id: "logo-container",
                 img { id: "itf-logo", src: TTKD_LOGO }
             }
@@ -76,7 +73,7 @@ fn BingoGrid() -> Element {
 
     let mut grid_size = use_signal(|| "3x3".to_string());
 
-    let mut bingo_grid = use_signal(|| PATTERNS[..9].to_vec());
+    let mut pattern_grid = use_signal(|| PATTERNS[..9].to_vec());
 
     use_effect(move || {
         let choice = belt_choice.choice.read();
@@ -128,7 +125,7 @@ fn BingoGrid() -> Element {
         match gs_as_str {
             // For 3x3 we are safe since every belt has at least 9 patterns available.
             "3x3" => {
-                bingo_grid.set(available_patterns[..9].to_vec());
+                pattern_grid.set(available_patterns[..9].to_vec());
             }
             // For all other grid sizes, we need to backfill.
             "4x4" => {
@@ -144,7 +141,7 @@ fn BingoGrid() -> Element {
                     }
                 }
 
-                bingo_grid.set(available_patterns[..16].to_vec());
+                pattern_grid.set(available_patterns[..16].to_vec());
             }
             "5x5" => {
                 //
@@ -159,7 +156,7 @@ fn BingoGrid() -> Element {
                     }
                 }
 
-                bingo_grid.set(available_patterns[..25].to_vec());
+                pattern_grid.set(available_patterns[..25].to_vec());
             }
 
             _ => panic!(""),
@@ -171,7 +168,7 @@ fn BingoGrid() -> Element {
     rsx! {
         div { id: "dropdown-container",
             // Selector for belt
-            label { r#for: "select-belt", "Välj bälte:" }
+            label { r#for: "select-belt", "Grade:" }
             select {
                 name: "select-belt",
                 id: "select-belt",
@@ -188,7 +185,7 @@ fn BingoGrid() -> Element {
                 option { value: "6-Dan", "VI Dan" }
             }
 
-            label { r#for: "select-grid", "Välj storlek:" }
+            label { r#for: "select-grid", "Size:" }
             select {
                 name: "select-grid",
                 id: "select-grid",
@@ -211,11 +208,11 @@ fn BingoGrid() -> Element {
 
         }
 
-        div { id: "bingo-grid-container",
+        div { id: "pattern-grid-container",
             div {
-                class: "bingo-grid size-{grid_size.read()}",
-                id: "bingo-grid_id",
-                for i in bingo_grid.read().iter() {
+                class: "pattern-grid size-{grid_size.read()}",
+                id: "pattern-grid_id",
+                for i in pattern_grid.read().iter() {
                     ButtonToggle { button_name: i }
                 }
             }
@@ -243,7 +240,7 @@ fn ButtonToggle(button_name: String) -> Element {
 
         button {
             class: "button-toggle {button_toggle.read()}",
-            id: "bingo-grid-single",
+            id: "pattern-grid-single",
             onclick: move |_| { button_toggle.toggle() },
             "{button_name}"
         }

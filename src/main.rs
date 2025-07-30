@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use components::Bingo;
+use components::Grid;
 
 mod components;
 
@@ -19,6 +19,6 @@ fn App() -> Element {
         document::Link { rel: "stylesheet", href: MAIN_CSS }
 
 
-        Bingo {}
+        Grid {}
     }
 }

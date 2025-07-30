@@ -1,10 +1,8 @@
 [package]
-name = "itf_patterns"
+name = "itf_patterns_rs"
 version = "0.1.0"
 authors = ["Oscar Aspelin <oscar.aspelin@gmail.com>"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 dioxus = { version = "0.7.0-alpha.3", features = [] }

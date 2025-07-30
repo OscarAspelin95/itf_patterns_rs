@@ -1,2 +1,2 @@
-mod bingo;
-pub use bingo::Bingo;
+mod grid;
+pub use grid::Grid;
