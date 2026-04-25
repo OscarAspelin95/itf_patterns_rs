@@ -54,48 +54,54 @@ body {
 	flex-direction: row;
 
 	&.size-1x1 {
-		grid-template-columns: repeat(1, 90px);
+		--cols: 1;
+		--col-width: 90px;
 	}
-
 	&.size-2x2 {
-		grid-template-columns: repeat(2, 110px);
+		--cols: 2;
+		--col-width: 110px;
 	}
-
 	&.size-3x3 {
-		grid-template-columns: repeat(3, 130px);
+		--cols: 3;
+		--col-width: 110px;
 	}
-
 	&.size-4x4 {
-		grid-template-columns: repeat(4, 150px);
+		--cols: 4;
+		--col-width: 110px;
+	}
+	&.size-5x5 {
+		--cols: 5;
+		--col-width: 110px;
 	}
 
-	&.size-5x5 {
-		grid-template-columns: repeat(5, 150px);
-	}
+	grid-template-columns: repeat(var(--cols), var(--col-width));
 
 	@media (max-width: 600px) {
 		width: 80%;
 		max-width: 600px;
 
 		&.size-1x1 {
-			grid-template-columns: repeat(1, 60px);
+			--cols: 1;
+			--col-width: 60px;
 		}
-
 		&.size-2x2 {
-			grid-template-columns: repeat(2, 70px);
+			--cols: 2;
+			--col-width: 70px;
 		}
-
 		&.size-3x3 {
-			grid-template-columns: repeat(3, 70px);
+			--cols: 3;
+			--col-width: 70px;
 		}
-
 		&.size-4x4 {
-			grid-template-columns: repeat(4, 70px);
+			--cols: 4;
+			--col-width: 70px;
+		}
+		&.size-5x5 {
+			--cols: 5;
+			--col-width: 70px;
 		}
 
-		&.size-5x5 {
-			grid-template-columns: repeat(5, 70px);
-		}
+		grid-template-columns: repeat(var(--cols), var(--col-width));
 	}
 }
 

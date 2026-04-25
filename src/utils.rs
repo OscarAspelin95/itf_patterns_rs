@@ -1,3 +1,6 @@
+use strum::{Display, EnumIter, EnumString};
+
+// Could use an enum here, not sure if necessary.
 pub static PATTERNS: &'static [&str; 24] = &[
     // 1-Kup
     "Chon-Ji",
@@ -32,32 +35,40 @@ pub static PATTERNS: &'static [&str; 24] = &[
     "Tong-Il",
 ];
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, EnumIter, EnumString, Display)]
 pub enum Degree {
+    #[strum(to_string = "1-Kup")]
     Kup1,
+    #[strum(to_string = "1-Dan")]
     Dan1,
+    #[strum(to_string = "2-Dan")]
     Dan2,
+    #[strum(to_string = "3-Dan")]
     Dan3,
+    #[strum(to_string = "4-Dan")]
     Dan4,
+    #[strum(to_string = "5-Dan")]
     Dan5,
+    #[strum(to_string = "6-Dan")]
     Dan6,
 }
 
-/// Currently loose coupling between string and num_patterns representation
 impl Degree {
-    fn as_str<'a>(&'a self) -> &'a str {
+    pub fn to_display(&self) -> String {
         match self {
-            Self::Kup1 => "1-Kup",
-            Self::Dan1 => "1-Dan",
-            Self::Dan2 => "2-Dan",
-            Self::Dan3 => "3-Dan",
-            Self::Dan4 => "4-Dan",
-            Self::Dan5 => "5-Dan",
-            Self::Dan6 => "6-Dan",
+            Self::Kup1 => "1 Kup".into(),
+            Self::Dan1 => "1 Dan".into(),
+            Self::Dan2 => "2 Dan".into(),
+            Self::Dan3 => "3 Dan".into(),
+            Self::Dan4 => "4 Dan".into(),
+            Self::Dan5 => "5 Dan".into(),
+            Self::Dan6 => "6 Dan".into(),
         }
     }
+}
 
-    fn num_patterns(&self) -> usize {
+impl Degree {
+    pub fn num_patterns(&self) -> usize {
         match self {
             Self::Kup1 => 9,
             Self::Dan1 => 12,
@@ -70,23 +81,30 @@ impl Degree {
     }
 }
 
-#[derive(Debug, Clone)]
+/// NOTE - must have matching CSS for
+/// proper formatting to be applied
+#[derive(Debug, Clone, EnumIter, EnumString, Display)]
 pub enum Sizes {
+    #[strum(to_string = "1x1")]
     One,
+    #[strum(to_string = "2x2")]
     Two,
+    #[strum(to_string = "3x3")]
     Three,
+    #[strum(to_string = "4x4")]
     Four,
+    #[strum(to_string = "5x5")]
     Five,
 }
 
 impl Sizes {
-    fn as_str<'a>(&'a self) -> &'a str {
+    pub fn num_patterns(&self) -> usize {
         match self {
-            Self::One => "1x1",
-            Self::Two => "2x2",
-            Self::Three => "3x3",
-            Self::Four => "4x4",
-            Self::Five => "5x5",
+            Self::One => 1,
+            Self::Two => 2 * 2,
+            Self::Three => 3 * 3,
+            Self::Four => 4 * 4,
+            Self::Five => 5 * 5,
         }
     }
 }

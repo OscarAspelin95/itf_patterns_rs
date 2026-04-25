@@ -1,6 +1,9 @@
-use crate::utils::PATTERNS;
+use std::str::FromStr;
+
+use crate::utils::{Degree, Sizes, PATTERNS};
 use dioxus::prelude::*;
 use rand::seq::{IndexedRandom, SliceRandom};
+use strum::IntoEnumIterator;
 
 #[component]
 pub fn Grid() -> Element {
@@ -25,92 +28,49 @@ pub struct Refresh {
 #[component]
 fn PatternGrid() -> Element {
     let mut belt_choice = use_context_provider(|| BeltChoice {
-        choice: Signal::new("1-Kup".to_string()),
+        choice: Signal::new(Degree::Kup1.to_string()),
     });
 
     let mut refresh = use_context_provider(|| Refresh {
         state: Signal::new(false),
     });
 
-    let mut grid_size = use_signal(|| "1x1".to_string());
-
-    let mut pattern_grid = use_signal(|| PATTERNS[..9].to_vec());
+    let mut grid_size = use_signal(|| Sizes::One.to_string());
+    let mut pattern_grid = use_signal(|| PATTERNS[..Sizes::One.num_patterns()].to_vec());
 
     use_effect(move || {
-        let choice = belt_choice.choice.read();
         let _ = refresh.state.read();
 
-        let s = choice.as_str();
+        // If changing belt
+        let choice = belt_choice.choice.read();
+
+        let chosen_degree =
+            Degree::from_str(choice.as_str()).expect(&format!("failed to parse {:?}", choice));
+        let num_patterns = chosen_degree.num_patterns();
+
+        // Get available patterns and shuffle
         let mut rng = rand::rng();
-
-        let num_patterns = match s {
-            "1-Kup" => 9,
-            "1-Dan" => 12,
-            "2-Dan" => 15,
-            "3-Dan" => 18,
-            "4-Dan" => 21,
-            "5-Dan" => 23,
-            "6-Dan" => 24,
-
-            _ => {
-                panic!("Invalid belt choice")
-            }
-        };
-
-        // First, extract available patterns in order.
         let mut available_patterns = PATTERNS[..num_patterns].to_vec();
-
-        // Randomly shuffle.
         available_patterns.shuffle(&mut rng);
 
+        // If changing grid size
         let grid_size_choice = grid_size.read();
-        let gs_as_str = grid_size_choice.as_str();
+        let chosen_size = Sizes::from_str(grid_size_choice.as_str())
+            .expect(&format!("failed to parse {:?}", grid_size_choice));
+        let num_required_patterns = chosen_size.num_patterns();
 
-        match gs_as_str {
-            "1x1" => {
-                pattern_grid.set(available_patterns[..1].to_vec());
-            }
-            "2x2" => {
-                pattern_grid.set(available_patterns[..4].to_vec());
-            }
-            // For 3x3 we are safe since every belt has at least 9 patterns available.
-            "3x3" => {
-                pattern_grid.set(available_patterns[..9].to_vec());
-            }
-            // For all other grid sizes, we need to backfill.
-            "4x4" => {
-                //
-                if available_patterns.len() < 16 {
-                    // Backfill until we have the desired amount of patterns.
-                    let mut secondary_set = available_patterns.clone();
-                    secondary_set.shuffle(&mut rng);
+        // Fill with random patterns if needed to reach required num patterns:
+        // 		E.g., 1-Kup only has 9 patterns and if grid size is 4x4
+        // 		we need to fill with 7 more patterns to reach 16 total.
+        while available_patterns.len() < num_required_patterns {
+            let mut secondary_set = available_patterns.clone();
+            secondary_set.shuffle(&mut rng);
 
-                    // This should be safe regardless of grid size.
-                    while available_patterns.len() < 16 {
-                        available_patterns.push(secondary_set.choose(&mut rng).unwrap());
-                    }
-                }
-
-                pattern_grid.set(available_patterns[..16].to_vec());
-            }
-            "5x5" => {
-                //
-                if available_patterns.len() < 25 {
-                    // Backfill until we have the desired amount of patterns.
-                    let mut secondary_set = available_patterns.clone();
-                    secondary_set.shuffle(&mut rng);
-
-                    // This should be safe regardless of grid size.
-                    while available_patterns.len() < 25 {
-                        available_patterns.push(secondary_set.choose(&mut rng).unwrap());
-                    }
-                }
-
-                pattern_grid.set(available_patterns[..25].to_vec());
-            }
-
-            _ => panic!("Invalid grid size choice"),
+            // This should be safe regardless of grid size.
+            available_patterns.push(secondary_set.choose(&mut rng).unwrap());
         }
+
+        pattern_grid.set(available_patterns[..num_required_patterns].to_vec());
     });
 
     rsx! {
@@ -125,14 +85,9 @@ fn PatternGrid() -> Element {
                         onchange: move |evt| {
                             belt_choice.choice.set(evt.value());
                         },
-                        // Should make this an Enum.
-                        option { value: "1-Kup", "1-Kup" }
-                        option { value: "1-Dan", "I Dan" }
-                        option { value: "2-Dan", "II Dan" }
-                        option { value: "3-Dan", "III Dan" }
-                        option { value: "4-Dan", "IV Dan" }
-                        option { value: "5-Dan", "V Dan" }
-                        option { value: "6-Dan", "VI Dan" }
+                        for d in Degree::iter(){
+                            option { value: "{d.to_string()}", "{d.to_display()}" }
+                        }
                     }
                 }
 
@@ -144,13 +99,9 @@ fn PatternGrid() -> Element {
                         onchange: move |evt| {
                             grid_size.set(evt.value());
                         },
-                        // List all options here.
-                        option { value: "1x1", "1x1" }
-                        option { value: "2x2", "2x2" }
-                        option { value: "3x3", "3x3" }
-                        option { value: "4x4", "4x4" }
-                        option { value: "5x5", "5x5" }
-
+                        for size in Sizes::iter() {
+                            option { value: "{size.to_string()}", "{size.to_string()}" }
+                        }
                     }
                 }
             }
