@@ -35,7 +35,8 @@ fn PatternGrid() -> Element {
         state: Signal::new(false),
     });
 
-    let mut grid_size = use_signal(|| Sizes::One.to_string());
+    let mut grid_size = use_context_provider(|| Signal::new(Sizes::One.to_string()));
+
     let mut pattern_grid = use_signal(|| PATTERNS[..Sizes::One.num_patterns()].to_vec());
 
     use_effect(move || {
@@ -131,10 +132,12 @@ fn PatternGrid() -> Element {
 fn ButtonToggle(button_name: String) -> Element {
     let mut button_toggle = use_signal(|| false);
     let belt_choice = use_context::<BeltChoice>();
+    let size_choice = use_context::<Signal<String>>();
     let refresh = use_context::<Refresh>();
 
     use_effect(move || {
         let _ = belt_choice.choice.read();
+        let _ = size_choice.read();
         let _ = refresh.state.read();
         button_toggle.set(false);
     });
