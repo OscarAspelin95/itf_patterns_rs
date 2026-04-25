@@ -1,52 +1,13 @@
+use crate::utils::PATTERNS;
 use dioxus::prelude::*;
 use rand::seq::{IndexedRandom, SliceRandom};
-
-const RANDOMIZE_SVG: Asset = asset!("/assets/randomize.svg");
-const TTKD_LOGO: Asset = asset!("/assets/ttkd_logo.jpeg");
-
-static PATTERNS: &'static [&str; 24] = &[
-    // 1-Kup
-    "Chon-Ji",
-    "Dan-Gun",
-    "Do-San",
-    "Won-Hyo",
-    "Yul-Gok",
-    "Choong-Gun",
-    "Toi-Gye",
-    "Hwa-Rang",
-    "Choong-Moo",
-    // 1-Dan
-    "Kwan-Gae",
-    "Po-Eun",
-    "Ge-Baek",
-    // 2-Dan
-    "Eui-Am",
-    "Choong-Jang",
-    "Juche",
-    // 3-Dan
-    "Sam-Il",
-    "Yoo-Sin",
-    "Choi-Yong",
-    // 4-Dan
-    "Yon-Gae",
-    "Ul-Ji",
-    "Moon-Moo",
-    // 5-Dan
-    "So-San",
-    "Se-Jong",
-    // 6-Dan
-    "Tong-Il",
-];
 
 #[component]
 pub fn Grid() -> Element {
     rsx! {
         div { id: "container",
-            span { id: "container-header", "Pattern randomizer" }
-            div { id: "logo-container",
-                img { id: "itf-logo", src: TTKD_LOGO }
-            }
-            BingoGrid {}
+            span { id: "container-header", "Pattern Randomizer" }
+            PatternGrid {}
         }
     }
 }
@@ -62,7 +23,7 @@ pub struct Refresh {
 }
 
 #[component]
-fn BingoGrid() -> Element {
+fn PatternGrid() -> Element {
     let mut belt_choice = use_context_provider(|| BeltChoice {
         choice: Signal::new("1-Kup".to_string()),
     });
@@ -71,7 +32,7 @@ fn BingoGrid() -> Element {
         state: Signal::new(false),
     });
 
-    let mut grid_size = use_signal(|| "3x3".to_string());
+    let mut grid_size = use_signal(|| "1x1".to_string());
 
     let mut pattern_grid = use_signal(|| PATTERNS[..9].to_vec());
 
@@ -82,35 +43,19 @@ fn BingoGrid() -> Element {
         let s = choice.as_str();
         let mut rng = rand::rng();
 
-        let num_patterns: usize;
-
-        match s {
-            "1-Kup" => {
-                num_patterns = 9;
-            }
-            "1-Dan" => {
-                num_patterns = 12;
-            }
-            "2-Dan" => {
-                num_patterns = 15;
-            }
-            "3-Dan" => {
-                num_patterns = 18;
-            }
-            "4-Dan" => {
-                num_patterns = 21;
-            }
-            "5-Dan" => {
-                num_patterns = 23;
-            }
-            "6-Dan" => {
-                num_patterns = 24;
-            }
+        let num_patterns = match s {
+            "1-Kup" => 9,
+            "1-Dan" => 12,
+            "2-Dan" => 15,
+            "3-Dan" => 18,
+            "4-Dan" => 21,
+            "5-Dan" => 23,
+            "6-Dan" => 24,
 
             _ => {
                 panic!("Invalid belt choice")
             }
-        }
+        };
 
         // First, extract available patterns in order.
         let mut available_patterns = PATTERNS[..num_patterns].to_vec();
@@ -118,11 +63,16 @@ fn BingoGrid() -> Element {
         // Randomly shuffle.
         available_patterns.shuffle(&mut rng);
 
-        // Then we need to extract only 3x3 or 4x4 patterns
         let grid_size_choice = grid_size.read();
         let gs_as_str = grid_size_choice.as_str();
 
         match gs_as_str {
+            "1x1" => {
+                pattern_grid.set(available_patterns[..1].to_vec());
+            }
+            "2x2" => {
+                pattern_grid.set(available_patterns[..4].to_vec());
+            }
             // For 3x3 we are safe since every belt has at least 9 patterns available.
             "3x3" => {
                 pattern_grid.set(available_patterns[..9].to_vec());
@@ -159,52 +109,57 @@ fn BingoGrid() -> Element {
                 pattern_grid.set(available_patterns[..25].to_vec());
             }
 
-            _ => panic!(""),
+            _ => panic!("Invalid grid size choice"),
         }
-
-        dbg!("{}", choice);
     });
 
     rsx! {
         div { id: "dropdown-container",
-            // Selector for belt
-            label { r#for: "select-belt", "Grade:" }
-            select {
-                name: "select-belt",
-                id: "select-belt",
-                onchange: move |evt| {
-                    belt_choice.choice.set(evt.value());
-                },
-                // List all options here.
-                option { value: "1-Kup", "1-Kup" }
-                option { value: "1-Dan", "I Dan" }
-                option { value: "2-Dan", "II Dan" }
-                option { value: "3-Dan", "III Dan" }
-                option { value: "4-Dan", "IV Dan" }
-                option { value: "5-Dan", "V Dan" }
-                option { value: "6-Dan", "VI Dan" }
-            }
+            div { id: "select-belt-size",
+                div { id: "select-belt-container",
+                    // Selector for belt
+                    label { r#for: "select-belt", "Grade:" }
+                    select {
+                        name: "select-belt",
+                        id: "select-belt",
+                        onchange: move |evt| {
+                            belt_choice.choice.set(evt.value());
+                        },
+                        // Should make this an Enum.
+                        option { value: "1-Kup", "1-Kup" }
+                        option { value: "1-Dan", "I Dan" }
+                        option { value: "2-Dan", "II Dan" }
+                        option { value: "3-Dan", "III Dan" }
+                        option { value: "4-Dan", "IV Dan" }
+                        option { value: "5-Dan", "V Dan" }
+                        option { value: "6-Dan", "VI Dan" }
+                    }
+                }
 
-            label { r#for: "select-grid", "Size:" }
-            select {
-                name: "select-grid",
-                id: "select-grid",
-                onchange: move |evt| {
-                    grid_size.set(evt.value());
-                },
-                // List all options here.
-                option { value: "3x3", "3x3" }
-                option { value: "4x4", "4x4" }
-                option { value: "5x5", "5x5" }
+                div { id: "select-size-container",
+                    label { r#for: "select-grid", "Size:" }
+                    select {
+                        name: "select-grid",
+                        id: "select-grid",
+                        onchange: move |evt| {
+                            grid_size.set(evt.value());
+                        },
+                        // List all options here.
+                        option { value: "1x1", "1x1" }
+                        option { value: "2x2", "2x2" }
+                        option { value: "3x3", "3x3" }
+                        option { value: "4x4", "4x4" }
+                        option { value: "5x5", "5x5" }
 
+                    }
+                }
             }
 
             button {
                 id: "refresh-btn",
                 onclick: move |_| { refresh.state.toggle() },
-                img { src: RANDOMIZE_SVG }
+                span { id: "refresh-logo", class: "material-symbols-outlined", "autorenew" }
             }
-
 
         }
 
@@ -213,10 +168,9 @@ fn BingoGrid() -> Element {
                 class: "pattern-grid size-{grid_size.read()}",
                 id: "pattern-grid_id",
                 for i in pattern_grid.read().iter() {
-                    ButtonToggle { button_name: i }
+                    ButtonToggle { button_name: i.to_string() }
                 }
             }
-
 
         }
     }
@@ -225,19 +179,16 @@ fn BingoGrid() -> Element {
 #[component]
 fn ButtonToggle(button_name: String) -> Element {
     let mut button_toggle = use_signal(|| false);
-
     let belt_choice = use_context::<BeltChoice>();
     let refresh = use_context::<Refresh>();
 
     use_effect(move || {
         let _ = belt_choice.choice.read();
         let _ = refresh.state.read();
-
         button_toggle.set(false);
     });
 
     rsx! {
-
         button {
             class: "button-toggle {button_toggle.read()}",
             id: "pattern-grid-single",

@@ -15,4 +15,14 @@ Download the desktop app from [releases](https://github.com/OscarAspelin95/itf_p
 ## Usage
 `dx serve`
 
+
+##
+```bash
+export ANDROID_HOME="/home/$USER/Android/Sdk" \
+&& export ANDROID_NDK_HOME="/home/$USER/Android/Sdk/ndk/30.0.14904198" \
+&& export JAVA_HOME="/home/$USER/android_studio/android-studio/jbr" \
+&& dx build --platform android --release --target aarch64-linux-android \
+&& cp ./target/dx/itf_patterns_rs/release/android/app/app/build/outputs/apk/debug/app-debug.apk itf_patterns.apk
+```
+
 ![play_gif](https://github.com/OscarAspelin95/itf_patterns_rs/blob/main/assets/itf_patterns.gif)

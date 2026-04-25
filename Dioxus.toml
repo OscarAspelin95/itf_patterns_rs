@@ -9,7 +9,7 @@ title = "itf_patterns_rs"
 style = []
 
 [bundle]
-identifier = "ITF Patterns Rs"
+identifier = "ITFpatterns.rs"
 description = "Desktop app for randomizing ITF patterns"
 publisher = "Oscar Aspelin"
 icon = ["assets/icon/32x32.png", "assets/icon/16x16.png"]
