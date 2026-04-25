@@ -177,6 +177,7 @@ body {
 	height: 100px;
 	font-size: 20px;
 	font-weight: 600;
+	position: relative;
 
 	&.true {
 		background-color: var(--ttkd-red);
@@ -194,4 +195,13 @@ body {
 		height: 50px;
 		font-weight: 400;
 	}
+}
+
+#toggle-is-complete {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
+	font-size: 60px;
 }

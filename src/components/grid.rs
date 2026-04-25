@@ -85,7 +85,7 @@ fn PatternGrid() -> Element {
                         onchange: move |evt| {
                             belt_choice.choice.set(evt.value());
                         },
-                        for d in Degree::iter(){
+                        for d in Degree::iter() {
                             option { value: "{d.to_string()}", "{d.to_display()}" }
                         }
                     }
@@ -145,6 +145,14 @@ fn ButtonToggle(button_name: String) -> Element {
             id: "pattern-grid-single",
             onclick: move |_| { button_toggle.toggle() },
             "{button_name}"
+
+            if *button_toggle.read() {
+                span {
+                    id: "toggle-is-complete",
+                    class: "material-symbols-outlined",
+                    "check"
+                }
+            }
         }
     }
 }

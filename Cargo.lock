@@ -2570,6 +2570,7 @@ name = "itf_patterns_rs"
 version = "0.0.1"
 dependencies = [
  "dioxus",
+ "getrandom 0.3.3",
  "rand 0.9.2",
  "strum",
 ]
